@@ -16,12 +16,13 @@ import {
   RegisterDto,
   UpdateProfileDto,
 } from './dto';
-import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { JwtGuard, LocalAuthGuard } from './guard';
 import { GetUser } from '@/decorators/get-users.decorator';
 import { User } from '@/user/entities/user.entity';
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
