@@ -34,6 +34,10 @@ export class User {
   @Exclude()
   resetToken?: string;
 
+  @Column({ nullable: true })
+  @Exclude()
+  resetTokenTime?: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 
