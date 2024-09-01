@@ -5,12 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Book } from './entities/book.entity';
 import { CategoryService } from '@/category/category.service';
+import { FirebaseService } from '@/firebase/firebase.service';
 
 @Injectable()
 export class BooksService {
   constructor(
     @InjectRepository(Book) private bookRepository: Repository<Book>,
     private categoryService: CategoryService,
+    private firebaseService: FirebaseService,
   ) {}
   async create(createBookDto: CreateBookDto): Promise<Book> {
     const { categoryId, ...bookData } = createBookDto;
@@ -32,10 +34,10 @@ export class BooksService {
     return { books };
   }
   async findOne(id: number): Promise<Book> {
-    const category = await this.bookRepository.findOne({ where: { id } });
+    const book = await this.bookRepository.findOne({ where: { id } });
 
-    if (category) {
-      return category;
+    if (book) {
+      return book;
     }
 
     throw new HttpException('Book does not exist.', HttpStatus.NOT_FOUND);
@@ -49,6 +51,24 @@ export class BooksService {
     book.category = category;
     Object.assign(book, updateData);
     return await this.bookRepository.save(book);
+  }
+  async uploadThumbnail(id: number, file: Express.Multer.File) {
+    const book = await this.findOne(id);
+    const destination = `uploads/${Date.now()}_${file.originalname}`;
+    const fileUrl = await this.firebaseService.uploadFile(file, destination);
+    book.thumbnailUrl = fileUrl;
+    return await this.bookRepository.save(book);
+  }
+
+  async deleteThumbnail(id: number) {
+    const book = await this.findOne(id);
+    book.thumbnailUrl = null;
+    return await this.bookRepository.save(book);
+  }
+  async findAllByCategory(categoryId: number): Promise<{ books: Book[] }> {
+    const category = await this.categoryService.findOne(categoryId);
+    const books = await this.bookRepository.find({ where: { category } });
+    return { books };
   }
 
   async remove(id: number): Promise<void> {

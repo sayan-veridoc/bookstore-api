@@ -22,6 +22,11 @@ export class CreateBookDto {
   @IsNotEmpty()
   author: string;
 
+  @IsString()
+  @ApiProperty()
+  @IsNotEmpty()
+  price: string;
+
   @ApiProperty({
     description: 'The ID of the category to which the book belongs',
   })

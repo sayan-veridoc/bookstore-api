@@ -12,44 +12,35 @@ import {
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto, UpdateBookDto } from './dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { JwtGuard } from '@/auth/guard';
-import { RolesGuard } from '@/auth/guard/roles.guard';
-
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtGuard, RolesGuard } from '@/auth/guard';
 import { Role } from '@/enum/roles.enum';
 import { Roles } from '@/decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FirebaseService } from '@/firebase/firebase.service';
 
 @Controller('books')
 @ApiTags('books')
 export class BooksController {
-  constructor(
-    private readonly booksService: BooksService,
-    private readonly firebaseService: FirebaseService,
-  ) {}
+  constructor(private readonly booksService: BooksService) {}
 
-  @Post('upload')
+  @Roles(Role.Admin)
+  @UseGuards(JwtGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Post('uploadThumbnail/:id')
   @UseInterceptors(FileInterceptor('file'))
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: 'File to upload',
-    type: 'multipart/form-data',
-    required: true,
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    const destination = `uploads/${Date.now()}_${file.originalname}`;
-    const fileUrl = await this.firebaseService.uploadFile(file, destination);
-    return { url: fileUrl };
+  async UploadThumbnail(
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return await this.booksService.uploadThumbnail(+id, file);
+  }
+
+  @Roles(Role.Admin)
+  @UseGuards(JwtGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Delete('deleteThumbnail/:id')
+  deletePhoto(@Param('id') id: number) {
+    return this.booksService.deleteThumbnail(+id);
   }
 
   @Roles(Role.Admin)
@@ -74,6 +65,11 @@ export class BooksController {
   @Get(':id')
   async findOne(@Param('id') id: number) {
     return await this.booksService.findOne(+id);
+  }
+
+  @Get('getByCategory/:id')
+  async findByCategory(@Param('id') id: number) {
+    return await this.booksService.findAllByCategory(+id);
   }
 
   @Roles(Role.Admin)

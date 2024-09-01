@@ -37,7 +37,7 @@ export class FirebaseService {
           const [signedUrl] = await fileUpload.getSignedUrl({
             version: 'v4',
             action: 'read',
-            expires: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days
+            expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
           });
 
           resolve(signedUrl);
