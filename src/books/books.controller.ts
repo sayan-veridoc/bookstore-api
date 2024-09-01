@@ -7,20 +7,50 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto, UpdateBookDto } from './dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '@/auth/guard';
 import { RolesGuard } from '@/auth/guard/roles.guard';
 
 import { Role } from '@/enum/roles.enum';
 import { Roles } from '@/decorators';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FirebaseService } from '@/firebase/firebase.service';
 
 @Controller('books')
 @ApiTags('books')
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(
+    private readonly booksService: BooksService,
+    private readonly firebaseService: FirebaseService,
+  ) {}
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'File to upload',
+    type: 'multipart/form-data',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    const destination = `uploads/${Date.now()}_${file.originalname}`;
+    const fileUrl = await this.firebaseService.uploadFile(file, destination);
+    return { url: fileUrl };
+  }
 
   @Roles(Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
