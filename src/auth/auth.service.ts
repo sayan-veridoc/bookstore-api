@@ -10,6 +10,7 @@ import {
 import { compareSync, hashSync } from 'bcryptjs';
 import { PostgresErrorCode } from '@/enum';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from '@/enum/roles.enum';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +27,28 @@ export class AuthService {
       const createdUser = await this.usersService.create({
         ...registerDto,
         password,
+      });
+
+      return createdUser;
+    } catch (error: any) {
+      if (error?.code === PostgresErrorCode.UniqueViolation) {
+        throw new HttpException(
+          'A user with that email already exists.',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  async crtRegularUser(registerDto: RegisterDto) {
+    const password = hashSync(registerDto.password);
+
+    try {
+      const createdUser = await this.usersService.create({
+        ...registerDto,
+        password,
+        roles: Role.User,
       });
 
       return createdUser;

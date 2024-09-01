@@ -8,34 +8,33 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { BooksService } from './books.service';
-import { CreateBookDto, UpdateBookDto } from './dto';
+import { CategoryService } from './category.service';
+import { CreateCategoryDto, UpdateCategoryDto } from './dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '@/auth/guard';
 import { RolesGuard } from '@/auth/guard/roles.guard';
-
-import { Role } from '@/enum/roles.enum';
 import { Roles } from '@/decorators';
+import { Role } from '@/enum/roles.enum';
 
-@Controller('books')
-@ApiTags('books')
-export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+@Controller('category')
+@ApiTags('booksCategory')
+export class CategoryController {
+  constructor(private readonly categoryService: CategoryService) {}
 
   @Roles(Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
   @ApiBearerAuth()
   @Post('create')
-  async create(@Body() createBookDto: CreateBookDto) {
-    return await this.booksService.create(createBookDto);
+  async create(@Body() createCategoryDto: CreateCategoryDto) {
+    return await this.categoryService.create(createCategoryDto);
   }
 
   // @Roles(Role.Admin)
   // @UseGuards(JwtGuard, RolesGuard)
   // @ApiBearerAuth()
-  @Get('allBooks')
+  @Get('allCategory')
   async findAll() {
-    return await this.booksService.findAll();
+    return await this.categoryService.findAll();
   }
 
   // @Roles(Role.Admin)
@@ -43,22 +42,25 @@ export class BooksController {
   // @ApiBearerAuth()
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.booksService.findOne(+id);
+    return await this.categoryService.findOne(+id);
   }
 
   @Roles(Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
   @ApiBearerAuth()
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateBookDto: UpdateBookDto) {
-    return await this.booksService.update(+id, updateBookDto);
+  update(
+    @Param('id') id: number,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
+    return this.categoryService.update(+id, updateCategoryDto);
   }
 
   @Roles(Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
   @ApiBearerAuth()
   @Delete(':id')
-  async remove(@Param('id') id: number) {
-    return await this.booksService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.categoryService.remove(+id);
   }
 }

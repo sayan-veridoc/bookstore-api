@@ -18,8 +18,8 @@ import {
 } from './dto';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { JwtGuard, LocalAuthGuard } from './guard';
-import { GetUser } from '@/decorators/get-users.decorator';
 import { User } from '@/user/entities/user.entity';
+import { GetUser } from '@/decorators';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -29,6 +29,10 @@ export class AuthController {
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     return await this.authService.register(registerDto);
+  }
+  @Post('registerUser')
+  async registerUser(@Body() registerDto: RegisterDto) {
+    return await this.authService.crtRegularUser(registerDto);
   }
 
   @HttpCode(200)
