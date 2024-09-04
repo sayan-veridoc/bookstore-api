@@ -71,7 +71,18 @@ export class BooksService {
     return { books };
   }
 
-  async remove(id: number): Promise<void> {
-    await this.bookRepository.delete(id);
+  async remove(id: number): Promise<object> {
+    await this.findOne(id);
+
+    try {
+      await this.bookRepository.delete(id);
+      return { message: `Book with ID ${id} deleted successfully` };
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'Failed to delete the book.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

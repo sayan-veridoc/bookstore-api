@@ -1,9 +1,11 @@
+import { Order } from '@/orders/entities/order.entity';
 import { Exclude } from 'class-transformer';
 import { Role } from 'src/enum/roles.enum';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -43,6 +45,9 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 
   constructor(partial: Partial<User>) {
     Object.assign(this, partial);

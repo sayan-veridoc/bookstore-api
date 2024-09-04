@@ -45,7 +45,17 @@ export class CategoryService {
     return updatedCategory;
   }
 
-  async remove(id: number): Promise<void> {
-    await this.catregoryRepository.delete(id);
+  async remove(id: number): Promise<object> {
+    await this.findOne(id);
+    try {
+      await this.catregoryRepository.delete(id);
+      return { message: `Category with ID ${id} deleted successfully` };
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'Failed to delete the category.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

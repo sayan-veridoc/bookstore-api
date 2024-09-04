@@ -7,6 +7,7 @@ import { BooksModule } from '@/books/books.module';
 import { CategoryModule } from '@/category/category.module';
 import { HealthModule } from '@/health/health.module';
 import { FirebaseModule } from './firebase/firebase.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { FirebaseModule } from './firebase/firebase.module';
     CategoryModule,
     HealthModule,
     FirebaseModule,
+    OrdersModule,
   ],
   // controllers: [AppController],
   // providers: [AppService],

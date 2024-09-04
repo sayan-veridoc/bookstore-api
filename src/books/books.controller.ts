@@ -26,7 +26,7 @@ export class BooksController {
   @Roles(Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
   @ApiBearerAuth()
-  @Post('uploadThumbnail/:id')
+  @Post('uploadImage/:id')
   @UseInterceptors(FileInterceptor('file'))
   async UploadThumbnail(
     @Param('id') id: number,
@@ -38,7 +38,7 @@ export class BooksController {
   @Roles(Role.Admin)
   @UseGuards(JwtGuard, RolesGuard)
   @ApiBearerAuth()
-  @Delete('deleteThumbnail/:id')
+  @Delete('deleteImage/:id')
   deletePhoto(@Param('id') id: number) {
     return this.booksService.deleteThumbnail(+id);
   }

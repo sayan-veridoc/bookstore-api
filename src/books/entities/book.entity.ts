@@ -1,6 +1,13 @@
 import { Category } from '@/category/entities/category.entity';
+import { Order } from '@/orders/entities/order.entity';
 import { Exclude } from 'class-transformer';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Book {
@@ -17,6 +24,9 @@ export class Book {
   @Column()
   title: string;
 
+  @Column({ default: 1 })
+  quantity?: number;
+
   @Column()
   description: string;
 
@@ -32,6 +42,9 @@ export class Book {
     onDelete: 'CASCADE',
   })
   category: Category;
+
+  @ManyToMany(() => Order, (order) => order.books)
+  orders: Order[];
 
   constructor(partial: Partial<Book>) {
     Object.assign(this, partial);
