@@ -54,6 +54,12 @@ export class AuthController {
   }
 
   @HttpCode(200)
+  @Get('getAllUser')
+  async getAllUser() {
+    return await this.authService.getAllUser();
+  }
+
+  @HttpCode(200)
   @ApiBearerAuth()
   @UseGuards(JwtGuard)
   @Patch('update-profile')

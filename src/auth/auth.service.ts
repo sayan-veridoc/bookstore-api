@@ -82,6 +82,11 @@ export class AuthService {
       );
     }
   }
+
+  async getAllUser() {
+    return await this.usersService.findAll();
+  }
+
   async updateProfile(id: number, newData: UpdateProfileDto) {
     return await this.usersService.update(id, newData);
   }
