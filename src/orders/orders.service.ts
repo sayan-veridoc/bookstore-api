@@ -5,22 +5,23 @@ import {
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Order } from './entities/order.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Book } from '@/books/entities/book.entity';
-import { UserService } from '@/user/user.service';
+import { UsersService } from '@/users/users.service';
+import { BooksService } from '@/books/books.service';
+import { User } from '@/users/entities/user.entity';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Order) private orderRepository: Repository<Order>,
-    @InjectRepository(Book) private bookRepository: Repository<Book>,
-    private usersService: UserService,
+    private usersService: UsersService,
+    private booksService: BooksService,
     // private categoryService: CategoryService,
     // private firebaseService: FirebaseService,
   ) {}
-  async create(userId: number, createOrderDto: CreateOrderDto) {
+  async placeOrder(userId: number, createOrderDto: CreateOrderDto) {
     const user = await this.usersService.findById(userId);
 
     const bookIds = createOrderDto.books.map((book) => book.bookId);
@@ -30,9 +31,7 @@ export class OrdersService {
       requestedQuantities.set(bookOrder.bookId, bookOrder.quantity);
     });
 
-    const books = await this.bookRepository.find({
-      where: { id: In(bookIds) },
-    });
+    const books = await this.booksService.findBooksByIds(bookIds);
 
     if (books.length !== bookIds.length) {
       throw new NotFoundException('One or more books not found');
@@ -61,15 +60,16 @@ export class OrdersService {
       });
     }
     const order = this.orderRepository.create({
-      user,
+      user: user as User,
       books,
       totalPrice: totalPrice.toString(),
     });
     return await this.orderRepository.save(order);
   }
 
-  findAll() {
-    return `This action returns all orders`;
+  async getAllOrders() {
+    const orders = await this.orderRepository.find();
+    return { orders };
   }
 
   findOne(id: number) {

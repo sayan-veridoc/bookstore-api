@@ -18,7 +18,7 @@ import {
 } from './dto';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { JwtGuard, LocalAuthGuard } from './guard';
-import { User } from '@/user/entities/user.entity';
+import { User } from '@/users/entities/user.entity';
 import { GetUser } from '@/decorators';
 
 @Controller('auth')

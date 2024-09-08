@@ -1,4 +1,3 @@
-import { UserService } from '@/user/user.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -11,13 +10,14 @@ import { compareSync, hashSync } from 'bcryptjs';
 import { PostgresErrorCode } from '@/enum';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@/enum/roles.enum';
+import { UsersService } from '@/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     // private schedulerRegistry: SchedulerRegistry,
     private configService: ConfigService,
-    private usersService: UserService,
+    private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
   async register(registerDto: RegisterDto) {

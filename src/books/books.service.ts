@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Book } from './entities/book.entity';
 import { CategoryService } from '@/category/category.service';
 import { FirebaseService } from '@/firebase/firebase.service';
@@ -41,6 +41,14 @@ export class BooksService {
     }
 
     throw new HttpException('Book does not exist.', HttpStatus.NOT_FOUND);
+  }
+
+  async findBooksByIds(ids: number[]) {
+    const books = await this.bookRepository.find({ where: { id: In(ids) } });
+    if (books) {
+      return books;
+    }
+    throw new HttpException('Books does not exist.', HttpStatus.NOT_FOUND);
   }
 
   async update(id: number, updateBookDto: UpdateBookDto): Promise<Book> {

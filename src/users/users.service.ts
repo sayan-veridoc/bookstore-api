@@ -2,11 +2,12 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { CreateUserDto, UpdateUserDto } from './dto';
+
 import { randomBytes } from 'crypto';
+import { CreateUserDto, UpdateUserDto } from './dto';
 
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
@@ -23,7 +24,7 @@ export class UserService {
     return { users };
   }
 
-  async findById(id: number): Promise<User> {
+  async findById(id: number) {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (user) {

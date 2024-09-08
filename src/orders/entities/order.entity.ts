@@ -6,8 +6,9 @@ import {
   PrimaryGeneratedColumn,
   JoinTable,
 } from 'typeorm';
-import { User } from '@/user/entities/user.entity';
+import { User as UserEntity } from '@/users/entities/user.entity';
 import { Book } from '@/books/entities/book.entity';
+import type { User } from '@/users/entities/user.entity';
 
 @Entity()
 export class Order {
@@ -17,12 +18,16 @@ export class Order {
   @Column()
   totalPrice: string;
 
-  @ManyToMany(() => Book, (book) => book.orders, { eager: true })
+  @ManyToOne(() => UserEntity, (user) => user.orders, {
+    eager: true,
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  user: User;
+
+  @ManyToMany(() => Book, (book) => book.orders)
   @JoinTable()
   books: Book[];
-
-  @ManyToOne(() => User, (user) => user.orders, { lazy: true, eager: false })
-  user: Promise<User>;
 
   constructor(partial: Partial<Order>) {
     Object.assign(this, partial);
